@@ -1,7 +1,5 @@
 # 🧠 NeuroNet Arena
 
-![Gameplay](img/gameplay.png)
-
 **NeuroNet Arena** is a fully autonomous AI ecosystem simulator where evolving neural agents battle for survival in a graph-based arena. Each agent is controlled by a lightweight custom neural network that perceives its environment, makes real-time decisions, and adapts across generations via a genetic algorithm.
 
 This project fuses artificial intelligence, evolution strategies, real-time simulation, and game theory — all visualized using Pygame.

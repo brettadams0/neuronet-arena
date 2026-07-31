@@ -1,76 +1,70 @@
-# 🧠 NeuroNet Arena
+# neuronet-arena
 
-**NeuroNet Arena** is a fully autonomous AI ecosystem simulator where evolving neural agents battle for survival in a graph-based arena. Each agent is controlled by a lightweight custom neural network that perceives its environment, makes real-time decisions, and adapts across generations via a genetic algorithm.
+An evolution simulator. Twenty agents move around a 2D arena scattered with food and hazards; each
+one is steered by its own small feedforward network. At the end of a generation the highest-scoring
+agents are cloned, their weights are perturbed, and the next generation runs. Rendered live in
+Pygame.
 
-This project fuses artificial intelligence, evolution strategies, real-time simulation, and game theory — all visualized using Pygame.
-
----
-
-## 🎮 Live Simulation Demo
+The point of the project is that nothing here is a library call — the network, the forward pass, and
+the mutation operator are all written out in plain Python over nested lists. No PyTorch, no NumPy.
+It is much slower than a framework would be, and much clearer about what a "brain" actually is.
 
 <img src="img/gameplay.png" width="700"/>
 
----
+## Running it
 
-## 🚀 Features
-
-- 🤖 **Neural Net Agents**: Every agent has a unique feedforward brain that processes environment inputs and outputs directional decisions.
-- 🌐 **Graph-Based Arena**: Food, hazards, and neutral zones are randomly distributed in a graph-like space.
-- 🧬 **Genetic Evolution**: Top performers clone and mutate their brains into the next generation.
-- 🧠 **Handwritten Neural Network**: No PyTorch, no TensorFlow — 100% built-from-scratch network and mutation logic.
-- 🖼️ **Pygame Animation**: See agents move, turn, survive, and adapt in real time.
-- 📊 **Fitness Dynamics**: Agents gain/lose points by interacting with environmental elements.
-
----
-
-## 🗂️ Project Structure
-```bash
-neuronet-arena/ 
-├── main.py 
-├── img/ │ 
-└── gameplay.png 
-└── engine/ 
-├── simulator.py # Simulation loop 
-├── arena.py # Graph-based world generation 
-├── agent.py # Agent behavior & logic 
-├── brain.py # Custom neural network 
-├── evolution.py # Reproduction + mutation 
-└── visualizer.py # Real-time Pygame rendering
-```
-
-
----
-
-## 🧪 How It Works
-
-Agents receive 6-dimensional input vectors:
-- Nearby food count
-- Nearby hazard count
-- Average direction of local nodes
-- Current facing direction (cos/sin)
-
-They process these through their neural net and produce a **directional change** as output. Over time, the best brains survive and mutate — leading to stronger decision-making and emergent behavior.
-
----
-
-## 🔧 Installation
-
-```bash
-git clone https://github.com/brettadams0/neuronet-arena.git
-cd neuronet-arena
-pip install pygame
+```sh
+pip install -r requirements.txt   # pygame
 python main.py
 ```
----
 
-### 📈 Ideas for Expansion
-- Add pheromone trails or memory
+Configuration lives at the top of `main.py`: 20 agents, 50 nodes, 100 generations, 300 steps per
+generation, in an 800x600 arena.
 
-- Visualize population fitness trends
+## The network
 
-- Use reinforcement learning instead of evolution
+`engine/brain.py` — 6 inputs → 12 hidden (tanh) → 2 outputs (sigmoid), Xavier-initialised.
 
-- Introduce cooperative or hostile agent factions
+Each tick, `Agent.sense` builds the input vector:
 
-## 📜 License
-MIT License
+| Input | |
+|---|---|
+| 0 | Food nodes within vision radius, scaled by 1/10 |
+| 1 | Hazard nodes within vision radius, scaled by 1/10 |
+| 2–3 | Mean offset to visible nodes, x and y, scaled by 1/100 |
+| 4–5 | Current heading as `cos(θ)`, `sin(θ)` |
+
+`decide` maps the first output to a turn of at most ±π/16 and applies it; `act` steps forward along
+the new heading and resolves any node the agent lands on. Fitness accumulates from those node
+interactions.
+
+Worth noting: the network declares two outputs but `decide` only reads `output[0]`. The second is
+computed and thrown away — a spare lever for something like a speed control, currently unused.
+
+## Evolution
+
+`engine/evolution.py` keeps the top performers, clones their brains, and calls `Brain.mutate`, which
+walks every weight and bias and adds uniform noise in `[-strength, +strength]` with probability
+`rate` (defaults `0.1` / `0.5`). Straight hill-climbing with cloning — no crossover between parents.
+
+## Layout
+
+```
+main.py                 entry point and configuration
+engine/simulator.py     generation loop
+engine/arena.py         world generation, node placement
+engine/agent.py         sense / decide / act
+engine/brain.py         the network
+engine/evolution.py     selection and mutation
+engine/visualizer.py    Pygame rendering
+```
+
+## Where it could go
+
+Crossover between two parents rather than clone-and-mutate. Memory, so an agent's state carries
+across ticks. A fitness-over-time plot, which would show whether evolution is actually working or
+just drifting.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

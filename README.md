@@ -97,7 +97,7 @@ the two engines are kept identical down to the last bit, and the test suites pro
 That takes more than porting the logic. IEEE 754 requires `+ − × ÷` and `sqrt` to be correctly
 rounded, so those agree everywhere; it does not require that of `tanh`, `exp`, `sin` or `cos`. On
 200,000 random inputs in [−4, 4], CPython 3.13 (glibc) and Node 22 (V8) returned different doubles
-for `tanh` 62 times, `sin` 6,690 times and `exp` 19,930 times. A generation makes about 240,000
+for `tanh` 62 times, `sin` 6,690 times and `exp` 19,930 times. A generation makes up to 288,000
 activation calls, and one flipped last bit is enough for a chaotic, 600-step simulation to become a
 different run. So the hot path uses only the operations IEEE does pin down:
 

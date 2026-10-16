@@ -1,0 +1,14 @@
+{
+  "name": "neuronet-arena-web",
+  "private": true,
+  "description": "Browser engine and live demo for neuronet-arena. No build step: the files here are served as-is.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "5.9.3"
+  }
+}

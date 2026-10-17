@@ -21,7 +21,8 @@ from neuronet.brain import Brain, layer_sizes
 OUT = Path(__file__).resolve().parent.parent / "fixtures" / "golden.json"
 
 # Small enough to run in well under a second in either engine, big enough to
-# exercise eating, respawning, hazard contact, deaths, crossover and elitism.
+# exercise eating, respawning, hazard contact, crossover and elitism. (No agent
+# dies in it; deaths are covered by the trained-population replay instead.)
 RUN_CONFIG = Config(population=12, food_count=30, hazard_count=6, steps=240, hidden=6)
 RUN_SEED = 20261016
 GENERATIONS = 4

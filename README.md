@@ -20,8 +20,10 @@ recorded.
 The first version of this project could not say. It also, it turned out, did not: `Simulation.run`
 rebuilt the population from fresh random networks at the top of every generation, so the evolved
 brains were thrown away unused — instrumenting it showed 0 of 20 surviving into the next
-generation. Food was never consumed either, so an agent parked on one food node scored a point
-every tick (300 in 300 ticks, without moving). Both are pinned by regression tests now.
+generation. Food was never consumed either: an agent scored a point for every tick it spent within
+10 px of a food node, and the node never ran out. Agents moved at a fixed speed, so none could sit
+on one, but an agent that just circled a single food node scored about 80 points in 300 ticks. Both bugs
+are pinned by regression tests now.
 
 So the rewrite measures it. `neuronet experiment` runs every seed twice with an identical config,
 once normally and once with selection switched off — parents drawn uniformly at random, no elitism,
@@ -37,7 +39,7 @@ that opens is selection's doing.
 |---|---:|---:|
 | Food per agent, generation 0 | 1.07 | 1.07 |
 | Food per agent, last 10 generations | **13.39** | **0.98** |
-| &nbsp;&nbsp;range across seeds | 12.75 – 13.76 | 0.59 – 1.49 |
+| &nbsp;&nbsp;range across seeds | 12.75 – 13.76 | 0.60 – 1.49 |
 | Agents alive at the end, of 40 | 33.0 | 13.4 |
 | Steps touching a hazard, per food eaten | 0.52 | 3.56 |
 
@@ -97,9 +99,12 @@ the two engines are kept identical down to the last bit, and the test suites pro
 That takes more than porting the logic. IEEE 754 requires `+ − × ÷` and `sqrt` to be correctly
 rounded, so those agree everywhere; it does not require that of `tanh`, `exp`, `sin` or `cos`. On
 200,000 random inputs in [−4, 4], CPython 3.13 (glibc) and Node 22 (V8) returned different doubles
-for `tanh` 62 times, `sin` 6,690 times and `exp` 19,930 times. A generation makes up to 288,000
-activation calls, and one flipped last bit is enough for a chaotic, 600-step simulation to become a
-different run. So the hot path uses only the operations IEEE does pin down:
+for `tanh` 62 times, `sin` 6,690 times and `exp` 19,930 times. That doesn't change outcomes: with
+`tanh` in both engines, three generations from the trained population end with identical scores
+and genomes. It does change state: by the third generation two agents are about 1e-7 px apart. So
+a cross-engine test would need a tolerance, and a tolerance can't tell rounding noise from a small
+porting bug. To let the tests demand exact equality, the hot path uses only the operations IEEE
+does pin down:
 
 - **A shared PRNG.** xoshiro128\*\* seeded by splitmix32 ([`rng.py`](src/neuronet/rng.py),
   [`rng.js`](web/src/rng.js)), all 32-bit integer arithmetic. Normal samples come from an
@@ -112,8 +117,8 @@ different run. So the hot path uses only the operations IEEE does pin down:
   compensated summation for floats and would no longer match a plain JavaScript loop.
 
 [`fixtures/golden.json`](fixtures/golden.json) holds a trace written by the Python engine: RNG
-output, a forward pass, and a four-generation run sampled every 20 steps, positions, headings,
-energy and food included. [`tests/test_golden.py`](tests/test_golden.py) and
+output, a forward pass, every agent's position, heading and energy (and every food position) every
+20 steps through one generation, and the stats, RNG state and genomes after four. [`tests/test_golden.py`](tests/test_golden.py) and
 [`web/test/golden.test.js`](web/test/golden.test.js) both compare against it with exact equality.
 Separately, the population the demo starts from was trained for 200 generations in Python and
 saved with the stats Python scored on generation 200; the JavaScript tests, and the demo page

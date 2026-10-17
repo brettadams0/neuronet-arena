@@ -6,10 +6,12 @@ row-major (one row of ``n_in`` weights per output neuron), then the
 ``n_out`` biases. ``web/src/brain.js`` reads the same layout.
 
 The activation is softsign, ``x / (1 + |x|)``, not tanh. They have the same
-shape, but tanh is not required to be correctly rounded and CPython's libm and
-V8 disagree on it in the last bit often enough to split a trajectory within a
-few hundred steps. Softsign is one add, one abs and one divide, all of which
-IEEE 754 does define exactly, so both engines compute the same bits.
+shape, but tanh is not required to be correctly rounded, and CPython's libm and
+V8 disagree on it in the last bit. That never changed a score in testing, but
+it does move agents by fractions of a pixel, which would force the cross-engine
+tests to allow a tolerance. Softsign is one add, one abs and one divide, all of
+which IEEE 754 defines exactly, so both engines compute the same bits and the
+tests can demand exact equality.
 """
 
 from __future__ import annotations

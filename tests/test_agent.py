@@ -143,7 +143,7 @@ def test_energy_is_capped() -> None:
 
 
 def test_food_cannot_be_farmed_by_standing_still() -> None:
-    # The original simulator scored +1 per tick for parking on a food node.
+    # The original simulator scored +1 for every tick spent touching a food node.
     world = World(Config(food_count=1, hazard_count=0), Rng(0))
     world.food_x, world.food_y = [482.0], [300.0]
     agent = _agent()

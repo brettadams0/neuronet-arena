@@ -10,8 +10,9 @@ measured or reproduced.
 - **Evolved brains were discarded every generation.** `Simulation.run` called `setup()` at the top
   of each generation, which rebuilt every agent with a fresh random network, so the output of
   `evolve_population` was never used: 0 of 20 evolved brains reached the next generation.
-- **Food was never consumed.** An agent standing on a food node scored +1 every tick (300 in 300
-  ticks without moving). Food is now eaten, restores energy, and respawns elsewhere.
+- **Food was never consumed.** An agent scored +1 for every tick it spent within reach of a food
+  node, and the node never ran out; circling a single one scored about 80 points in 300 ticks. Food is
+  now eaten, restores energy, and respawns elsewhere.
 - **The second network output was computed and ignored.** It now drives the throttle.
 - **The pygame window never pumped events**, so it could not be closed and was reported as not
   responding.

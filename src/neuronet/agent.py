@@ -195,7 +195,7 @@ def _nearest(
 ) -> tuple[float, float, float]:
     """(nearness, ahead, right) of the closest item within ``vision``, or zeros.
 
-    ``nearness`` is 1 at contact and 0 at the edge of vision; ``ahead`` and
+    ``nearness`` is 1 at zero distance and 0 at the edge of vision; ``ahead`` and
     ``right`` are the cosine and sine of the bearing relative to the heading.
     In screen coordinates (y down) positive ``right`` is clockwise, the same
     way a positive steer turns.

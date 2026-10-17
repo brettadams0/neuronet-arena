@@ -22,8 +22,8 @@ rebuilt the population from fresh random networks at the top of every generation
 brains were thrown away unused — instrumenting it showed 0 of 20 surviving into the next
 generation. Food was never consumed either: an agent scored a point for every tick it spent within
 10 px of a food node, and the node never ran out. Agents moved at a fixed speed, so none could sit
-on one, but an agent that just circled a single food node scored about 80 points in 300 ticks. Both bugs
-are pinned by regression tests now.
+on one, but circling a single food node as tightly as the steering allowed could score up to about
+80 points in 300 ticks. Both bugs are pinned by regression tests now.
 
 So the rewrite measures it. `neuronet experiment` runs every seed twice with an identical config,
 once normally and once with selection switched off — parents drawn uniformly at random, no elitism,
@@ -40,7 +40,7 @@ that opens is selection's doing.
 | Food per agent, generation 0 | 1.07 | 1.07 |
 | Food per agent, last 10 generations | **13.39** | **0.98** |
 | &nbsp;&nbsp;range across seeds | 12.75 – 13.76 | 0.60 – 1.49 |
-| Agents alive at the end, of 40 | 33.0 | 13.4 |
+| Agents alive at the end of a generation, of 40 (last 10) | 33.0 | 13.4 |
 | Steps touching a hazard, per food eaten | 0.52 | 3.56 |
 
 Evolved populations eat 13.7× as much, and mostly stay alive while doing it. The median passes ten
@@ -64,7 +64,7 @@ have to learn trigonometry before it can learn to forage:
 
 | Input | |
 |---|---|
-| `food: near` | 1 at contact, 0 at the edge of vision (140 px); 0 if nothing is in sight |
+| `food: near` | 1 at zero distance, falling to 0 at the edge of vision (140 px); 0 if nothing is in sight |
 | `food: ahead`, `food: right` | cosine and sine of the bearing to the nearest food |
 | `hazard: near`, `hazard: ahead`, `hazard: right` | the same for the nearest hazard |
 | `wall ahead` | how close the boundary is along the current heading |
@@ -101,7 +101,7 @@ rounded, so those agree everywhere; it does not require that of `tanh`, `exp`, `
 200,000 random inputs in [−4, 4], CPython 3.13 (glibc) and Node 22 (V8) returned different doubles
 for `tanh` 62 times, `sin` 6,690 times and `exp` 19,930 times. That doesn't change outcomes: with
 `tanh` in both engines, three generations from the trained population end with identical scores
-and genomes. It does change state: by the third generation two agents are about 1e-7 px apart. So
+and genomes. It does change state: by the third generation two agents have drifted, one by about 1e-7 px. So
 a cross-engine test would need a tolerance, and a tolerance can't tell rounding noise from a small
 porting bug. To let the tests demand exact equality, the hot path uses only the operations IEEE
 does pin down:
@@ -124,8 +124,8 @@ Separately, the population the demo starts from was trained for 200 generations 
 saved with the stats Python scored on generation 200; the JavaScript tests, and the demo page
 itself, replay that generation and check every number matches.
 
-The payoff is speed where it is needed: a generation of the trained population takes about 0.7 s
-in CPython and under 20 ms in V8, so the browser can fast-forward through dozens of generations a
+The payoff is speed where it is needed: a generation of the trained population takes about half a
+second in CPython and under 20 ms in V8, so the browser can fast-forward through dozens of generations a
 second while Python stays the reference implementation.
 
 ## Running it

@@ -58,3 +58,13 @@ test("a full run matches Python step for step", () => {
   assert.deepEqual(sim.rng.state(), g.rng);
   assert.deepEqual(sim.genomes, g.genomes);
 });
+
+test("a run with selection off matches Python", () => {
+  const g = golden.run_random;
+  const sim = new Simulation(makeConfig(g.config), g.seed);
+  const stats = [];
+  for (let i = 0; i < g.generations; i++) stats.push(sim.runGeneration());
+  assert.deepEqual(stats, g.stats);
+  assert.deepEqual(sim.rng.state(), g.rng);
+  assert.deepEqual(sim.genomes, g.genomes);
+});

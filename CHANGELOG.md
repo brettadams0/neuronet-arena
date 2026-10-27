@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Selection on vs off, side by side, in the web demo.** The README's controlled experiment runs
+  live: two arenas from the same seed and world, the right one with `selection: "random"`, a chart of
+  food per agent by generation, and a running comparison. It starts on a click and pauses off screen.
+- **`fixtures/golden.json` gains `run_random`**, a run with selection off, so the Python and
+  JavaScript engines are tested against each other on that path too.
+
 ## 2.0.0 — 2026-10-16
 
 A rewrite. The 1.x simulator ran, but it could not evolve anything, and nothing about it could be

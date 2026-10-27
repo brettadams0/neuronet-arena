@@ -11,6 +11,7 @@ other, one of the two engines has drifted.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from pathlib import Path
 from typing import Any
@@ -79,7 +80,26 @@ def golden() -> dict[str, Any]:
         "rng": sim.rng.state(),
         "genomes": sim.genomes,
     }
-    return {"rng": rng_section, "brain": brain_section, "run": run_section}
+    # The same run with selection off (parents drawn uniformly, no elites): the
+    # web demo's side-by-side runs this next to the default, so both engines must
+    # agree on it too.
+    random_cfg = dataclasses.replace(RUN_CONFIG, selection="random")
+    rsim = Simulation(random_cfg, seed=RUN_SEED)
+    rstats = rsim.run(GENERATIONS)
+    random_section = {
+        "seed": RUN_SEED,
+        "config": random_cfg.to_dict(),
+        "generations": GENERATIONS,
+        "stats": [s.to_dict() for s in rstats],
+        "rng": rsim.rng.state(),
+        "genomes": rsim.genomes,
+    }
+    return {
+        "rng": rng_section,
+        "brain": brain_section,
+        "run": run_section,
+        "run_random": random_section,
+    }
 
 
 if __name__ == "__main__":

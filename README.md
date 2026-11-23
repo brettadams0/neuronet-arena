@@ -9,7 +9,7 @@ generation. The network, the genetic algorithm and the random number generator a
 by hand — no NumPy, no PyTorch, no `random` — in Python, and again in JavaScript for a live demo
 that reproduces the Python engine bit for bit.
 
-**[Live demo](https://brettadams0.github.io/neuronet-arena/)** — runs in the browser, starting from
+**[Live demo](https://brettadams.ca/neuronet-arena/)** — runs in the browser, starting from
 a population trained here in Python, and checks on screen that it scores exactly what Python
 recorded.
 

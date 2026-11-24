@@ -26,7 +26,7 @@ dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
 neuronet = "neuronet.cli:main"
 
 [project.urls]
-Demo = "https://brettadams0.github.io/neuronet-arena/"
+Demo = "https://brettadams.ca/neuronet-arena/"
 Source = "https://github.com/brettadams0/neuronet-arena"
 
 [tool.hatch.build.targets.wheel]
